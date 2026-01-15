@@ -1,37 +1,54 @@
 import { useEffect, useState } from "react";
+import confetti from "canvas-confetti";
 import type { Question } from "../data/questions";
 import { updateAfterQuiz } from "../utils/gamification";
 
-type Props = {
+type ResultProps = {
   questions: Question[];
   answers: Record<number, number>;
   courseId: string;
   lessonId: string;
 };
 
-export default function Result({ questions, answers, courseId, lessonId }: Props) {
+export default function Result({ questions, answers, courseId, lessonId }: ResultProps) {
   const score = questions.reduce(
-    (s, q) => s + (answers[q.id] === q.correctIndex ? 1 : 0),
+    (sum, q) => sum + (answers[q.id] === q.correctIndex ? 1 : 0),
     0
   );
 
   const [gamification, setGamification] = useState<any>(null);
 
   useEffect(() => {
-    fetch(`http://localhost:4000/courses/203fc05b-d8b5-43a1-bea3-583e194bdff0/progress`, {
+    fetch(`http://localhost:4000/courses/${courseId}/progress`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-api-key": "test123" },
-      body: JSON.stringify({ userId: "demo-user", lessonId, score })
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "test123"
+      },
+      body: JSON.stringify({
+        userId: "demo-user",
+        lessonId,
+        score
+      })
     });
 
     const g = updateAfterQuiz(score, questions.length);
     setGamification(g);
-  }, [score]);
+
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  }, [score, courseId, lessonId, questions.length]);
 
   return (
     <div className="result">
-      <h2>🎉 Quiz Completed!</h2>
-      <p>Score: {score} / {questions.length}</p>
+      <h2>Quiz Completed 🎉</h2>
+      <p>
+        You scored <strong>{score}</strong> out of{" "}
+        <strong>{questions.length}</strong>
+      </p>
 
       {gamification && (
         <>
@@ -39,7 +56,7 @@ export default function Result({ questions, answers, courseId, lessonId }: Props
           <p>🏆 Level: {gamification.level}</p>
           <p>🔥 Streak: {gamification.streak} days</p>
 
-          {gamification.badges.length > 0 && (
+          {gamification.badges?.length > 0 && (
             <div>
               <h4>Badges</h4>
               {gamification.badges.map((b: string) => (
@@ -50,7 +67,7 @@ export default function Result({ questions, answers, courseId, lessonId }: Props
         </>
       )}
 
-      <button onClick={() => window.location.reload()}>Back to Courses</button>
+      <button onClick={() => window.location.reload()}>Back to Dashboard</button>
     </div>
   );
 }
