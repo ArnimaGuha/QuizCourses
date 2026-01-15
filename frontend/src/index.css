@@ -111,3 +111,29 @@ button:disabled {
 .fade {
   opacity: 0.5;
 }
+.course-card {
+  background: white;
+  padding: 1.25rem 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.course-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
+}
+
+.dark body {
+  background: linear-gradient(135deg, #0f172a, #020617);
+  color: #e5e7eb;
+}
+
+.dark .course-card,
+.dark .quiz-card,
+.dark .result {
+  background: #020617;
+  box-shadow: 0 10px 30px rgba(255,255,255,0.05);
+}
